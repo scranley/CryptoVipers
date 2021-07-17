@@ -18,6 +18,7 @@
         <img v-if="isLoading" src="https://media.giphy.com/media/2A6xoqXc9qML9gzBUE/giphy.gif">
         <h3 v-if="!isLoading">or</h3>
       </b-col>
+   
       <b-col class="action-container">
         <h4>Breed two of the Vipers you own to make a new one!</h4>
         <b-form>
@@ -42,7 +43,24 @@
           <b-button v-on:click="breedVipers" type="button">Breed Vipers</b-button>
           <p>Breeding Vipers cost 0.05 Ether</p>
         </b-form>
+      </b-col>     
+
+   	  <b-col class="action-container">
+        <h4>Transfer a Viper</h4>
+		  <b-form-group id="ownerid"
+                        label="Owner ID:"
+                        label-for="ownerid">
+            <b-form-input id="ownerid"
+                          v-model="ownerid"
+                          required
+                          placeholder="Enter Owner ID">
+            </b-form-input>
+          </b-form-group>
+          <b-button v-on:click="changeOwner" type="button">Transfer Viper</b-button>
+          <p>Transfer Vipers cost 0.05 Ether</p>
+        </b-form>
       </b-col>
+
     </b-row>
 
     <hr>
@@ -84,7 +102,7 @@ import Viper5 from './assets/Viper/5.png';
 import Viper6 from './assets/Viper/6.png';
 import ViperX from './assets/Viper/unknown.png';
 
-const contractAddress = '0x4c8D1F851e2f0c280655254e9C3e95A4aE6A985A'; // Your deployed contract's address goes here
+const contractAddress = '0x196360732F336F88d4f0AC3F981c5Fee453dE9a6'; // Your deployed contract's address goes here
 // Example:
 // const contractAddress = '0x09r80cnasjfaks93m9v2';
 const vipersMap = [null, Viper1, Viper2, Viper3, Viper4, Viper5, Viper6];
@@ -100,6 +118,7 @@ export default {
       gene: null,
       matron: null,
       sire: null,
+	  ownerid: null,
       unknownViperImg: ViperX,
       vipers: [],
       isLoading: false,
@@ -132,7 +151,7 @@ export default {
     this.isLoading = false;
   });
 },
-   breedVipers() {
+breedVipers() {
   this.isLoading = true;
   this.contractInstance.methods.breedVipers(this.matron, this.sire).send({
     from: this.account,
@@ -140,6 +159,17 @@ export default {
   }).then((receipt) => {
     this.addViperFromReceipt(receipt);
     this.isLoading = false;
+  }).catch((err) => {
+    console.log(err, 'err');
+    this.isLoading = false;
+  });
+},
+
+ changeOwner() {
+  this.isLoading = true;
+  this.contractInstance.methods.changeOwner(this.ownerid).send({
+    from: this.account,
+    value: web3_utils.toWei("0.05", 'ether'),
   }).catch((err) => {
     console.log(err, 'err');
     this.isLoading = false;
